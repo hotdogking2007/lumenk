@@ -1,71 +1,61 @@
 use crate::lexer::{TokenType, Token};
-
 #[derive(Debug, Clone)]
-pub enum Expression{
-    Literal(Literal),
-    BlockExpression(BlockExpression),
-    IfExpression(IfExpression),
-    PrefixExpression(PrefixExpression),
-    InfixExpression(InfixExpression),
-    CallExpression(CallExpression),
-    IndexExpression(IndexExpression),
-
-}
-
-pub enum Value {
-    Identifier(Identifier),
-    String(StringLiteral),
-    Number(NumberValue),
-    Function(FunctionValue),
-    Array(ArrayValue),
-    Class(ClassValue)
-}
-
-
-
-
-pub struct BlockExpression{
-    pub exprs: Vec<Expression>,
-    pub t: Token
-}
-
-pub struct IfExpression{
-    pub condition: Box<Expression>,
-    pub consequence: Box<BlockExpression>,
-    pub t: Token
-}
-
-pub struct PrefixExpression {
-    pub op: Token,
-    pub r: Box<Expression>
-}
-
-pub struct InfixExpression {
-    pub l: Box<Expression>,
-    pub ops: Token,
-    pub r: Box<Expression>
-}
-
-pub struct CallExpression {
-    pub f: Box<Expression>,
-    pub args: Vec<Expression>,
-    pub t: Token
-}
-
-pub struct IndexExpression {
-    pub index: Box<Expression>
-}
-
-
-pub enum Statement {
-    Block(Vec<Expression>),
-    Expression {
-        expression: Box<dyn Expression>
+pub enum Expr{
+    Literal(Value),
+    Assign,
+    IfExpression {
+        condition: Box<Expr>,
+        consequence: Box<Expr>
     },
+    PrefixExpression(PreOp, Box<Expr>),
+    InfixExpression{l: Box<Expr>, op: BinOp, r: Box<Expr>},
+    CallExpression{
+        name: String,
+        args: Vec<Expr>
+    },
+    FunctionExpression {
+        name: String,
+        args: Vec<Expr>,
+        code: Box<Expr>
+    },
+    IndexExpression(Box<Expr>, Box<Expr>),
+}
+#[derive(Debug, Clone)]
+pub enum BinOp {
+    Add,
+    Minus,
+    Multi,
+    Div,
+    Mod,
+}
+#[derive(Debug, Clone)]
+pub enum PreOp {
+    Not,
+    Minus,
+    MemoryAdress,
+    Defer,
+}
+#[derive(Debug, Clone)]
+pub enum Value {
+    Identifier(String),
+    String(String),
+    Number(String),
+    Array(Vec<Expr>),
+    None
+}
+
+#[derive(Debug)]
+pub enum Stmt {
+    Block(Vec<Expr>),
     Var {
         kind: Token,
         name: Token,
-        init: Box<dyn Expression>
+        init: Box<Expr>
+    },
+    Class{
+        name: String,
+        property: Vec<Expr>,
+        method: Vec<Expr>,
     },
     None
 }

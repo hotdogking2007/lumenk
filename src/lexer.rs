@@ -12,6 +12,7 @@ pub enum TokenType {
     Minus,
     Star,
     Slash,
+    Mod,
     Assign,
     Semicolon,
     ReturnType,
@@ -95,6 +96,7 @@ impl Lexer {
                 },
                 '*' => self.add_token(TokenType::Star, "*".into()),
                 '/' => self.add_token(TokenType::Slash, "/".into()),
+                '%' => self.add_token(TokenType::Mod, "%".into()),
                 '=' => {
                     if source[next+1] == '=' {
                         self.add_token(TokenType::Assert, "==".into());
